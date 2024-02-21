@@ -1,8 +1,9 @@
 from proxy_db import *
-import sqlite3
+
+MAIN_WEBPAGE = "https://www.idealista.com"
 
 if __name__ == "__main__":
-	#FILTER PER TEST = PASS IN DB
-	#PING "GOOD PROXY" TO CHECK IF IT IS STILL UP
+	proxy_list = get_proxy_list()
+	generate_proxy_db(proxy_list)
+	filter_proxies_db() #looks for the first functional proxy
 	#START BACKEND IDEALISTA CALLING AND FILTERING
-	pass

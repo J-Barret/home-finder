@@ -11,15 +11,7 @@ from typing import Optional, Union
 
 ipv4_pattern = r'\b(?:\d{1,3}\.){3}\d{1,3}\b'
 port_pattern = r'\b\d{1,5}\b'
-
-headers_fetch = {":authority": "proxylist.geonode.com", ":method": "GET", ":path": "/api/proxy-list?limit=100&page=1&sort_by=lastChecked&sort_type=desc", ":scheme": "https",
-    "Accept": "application/json, text/plain, */*", "Accept-Encoding": "gzip, deflate, br", "Accept-Language": "en,es-ES;q=0.9,es;q=0.8,ru;q=0.7", "Cache-Control": "no-cache",
-    "Dnt": "1", "Origin": "https://geonode.com", "Pragma": "no-cache", "Referer": "https://geonode.com/",
-    "Sec-Ch-Ua": "\"Chromium\";v=\"118\", \"Google Chrome\";v=\"118\", \"Not=A?Brand\";v=\"99\"", "Sec-Ch-Ua-Mobile": "?0", "Sec-Ch-Ua-Platform": "\"Windows\"",
-    "Sec-Fetch-Dest": "empty", "Sec-Fetch-Mode": "cors", "Sec-Fetch-Site": "same-site",
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36"}
-
-
+num_retries = 1
 
 class Proxy_Scrap:
     # Constructor method to initialize the object
@@ -33,22 +25,22 @@ class Proxy_Scrap:
         self.status_code = 0
 
     @classmethod
-    def ping(cls, url, proxy_ip=None, proxy_port=None, timeout=3):
+    def ping(cls, url, proxy_ip=None, proxy_port=None, timeout=1):
         if proxy_ip and proxy_port:
             #specify both HTTP and HTTPS keys, requests.get will know which one to use depending on the "url" arg provided to the function
             proxy = {'http': f'http://{proxy_ip}:{proxy_port}',
                      'https': f'http://{proxy_ip}:{proxy_port}'}
-            try:
-                start_time = time.time()
-                response = requests.get(url, proxies=proxy, timeout=timeout)
-                end_time = time.time()
-                if response.status_code == 200:
-                    ping_time = (end_time - start_time) * 1000
-                    return response.status_code, ping_time
-                else:
-                    return response.status_code, 0
-            except requests.exceptions.RequestException as e:
-                    return None, None
+            for attempt in range(num_retries):
+                try:
+                    response = requests.get(url, proxies=proxy, timeout=timeout)
+                    #print(response.status_code)
+                    return response.status_code
+                except requests.exceptions.RequestException as e:
+                    if(attempt < num_retries-1):
+                        continue
+                    else:
+                        #print("Exception occurred:", e)
+                        return None
 
     def bs4_get(self):
         try:

@@ -30,6 +30,7 @@ def get_proxy_list():  # no need to check for possible errors here, exceptions a
 def generate_proxy_db(proxy_list):
 	db = sqlite3.connect(DB_NAME)
 	cursor = db.cursor()
+	cursor.execute("DROP TABLE IF EXISTS proxies")
 	cursor.execute(PROXIES_TABLE_CREATION)
 	for proxy_ip, proxy_port in proxy_list.items():
 		# check if there is already a record in the proxies table with the same IP and port as the current proxy being processed
@@ -40,39 +41,46 @@ def generate_proxy_db(proxy_list):
 	db.commit()
 	db.close()
 
-def filter_proxies_db(good_proxies_number: int):
+def filter_proxies_db():
 	db = sqlite3.connect(DB_NAME)
 	cursor = db.cursor()
 	cursor.execute("SELECT id, proxy_ip, proxy_port FROM proxies WHERE test = 'UNTESTED'")
 	all_rows = cursor.fetchall()
-	good_proxies_found = 0
+	i = 0
+	print(f"There were found {len(all_rows)} UNTESTED proxies. Looking for a functional proxy...")
 	for row in all_rows:
+		i += 1
+		print(f"\rProgress: {i}/{len(all_rows)}", end="", flush=True)
 		row_id = row[0]
 		proxy_ip = row[1]
 		proxy_port = row[2]
 		milis = None
 		if proxy_port in HTTP_PORT_TYPES:
-			ping_result = Proxy_Scrap.ping(SAMPLE_PING_WEB, proxy_ip=proxy_ip, proxy_port=proxy_port, timeout=PING_TIMEOUT)
+			ping_result = Proxy_Scrap.ping(SAMPLE_PING_WEB, proxy_ip=proxy_ip, proxy_port=proxy_port)
 		elif proxy_port in HTTPS_PORT_TYPES:
-			ping_result = Proxy_Scrap.ping(SAMPLE_PING_WEB, proxy_ip=proxy_ip, proxy_port=proxy_port, timeout=PING_TIMEOUT)
+			ping_result = Proxy_Scrap.ping(SAMPLE_PING_WEB, proxy_ip=proxy_ip, proxy_port=proxy_port)
 		#if port does not appear in predefined lists, we try each one
 		else:
-			ping_result = Proxy_Scrap.ping(SAMPLE_PING_WEB, proxy_ip=proxy_ip, proxy_port=proxy_port, timeout=PING_TIMEOUT)
+			ping_result = Proxy_Scrap.ping(SAMPLE_PING_WEB, proxy_ip=proxy_ip, proxy_port=proxy_port)
 			if ping_result is None:
-				ping_result = Proxy_Scrap.ping(SAMPLE_PING_WEB, proxy_ip=proxy_ip, proxy_port=proxy_port, timeout=PING_TIMEOUT)
+				ping_result = Proxy_Scrap.ping(SAMPLE_PING_WEB, proxy_ip=proxy_ip, proxy_port=proxy_port)
 		if ping_result is not None:
-			ack, milis = ping_result
-			test_result = "PASS" if ack == 200 else "FAIL"
-			cursor.execute("UPDATE proxies SET test = ? WHERE id = ?", (test_result, row_id)) #update DB with test result
-			if(test_result == "PASS"):
-				good_proxies_found += 1
-				print(f"{good_proxies_found}/{good_proxies_number} proxies found")
-				if(good_proxies_found >= good_proxies_number):
-					break
+			test_result = "PASS" if ping_result == 200 else "FAIL"
+		else: #if we do not have a status_code, it was a timeout, so it is also a fail
+			test_result = "FAIL"
+		cursor.execute("UPDATE proxies SET test = ? WHERE id = ?", (test_result, row_id))  # update DB with test result
+		if(test_result == "PASS"):
+			print(f"\nSUCCESS --> Proxy IP: {proxy_ip}, Proxy port: {proxy_port}")
+			db.commit()
+			db.close()
+			return proxy_ip, proxy_port
 	db.commit()
 	db.close()
+	raise ValueError("No functional proxies were found in the database")
+
+
 
 if __name__ == "__main__":
 	proxy_list = get_proxy_list()
 	generate_proxy_db(proxy_list)
-	filter_proxies_db(1) #looks for the first functional proxy
+	proxy_ip, proxy_port = filter_proxies_db() #looks for the first functional proxy
