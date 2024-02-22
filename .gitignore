@@ -1,0 +1,6 @@
+# Ignore compiled files
+*.class
+*.o
+
+# Ignore all HTML files recursively
+**/*.html
