@@ -11,8 +11,8 @@ PROXIES_TABLE_CREATION = '''
         test TEXT DEFAULT UNTESTED
     )
 '''
-PING_TIMEOUT = 5
-SAMPLE_PING_WEB = "http://www.google.es"
+PING_TIMEOUT = 2
+SAMPLE_PING_WEB = "http://www.google.com"
 HTTP_PORT_TYPES = ["80", "8080", "8000", "8081", "8088", "8009", "8443"]
 HTTPS_PORT_TYPES = ["443", "8443", "2087", "2096"]
 MAX_LOOPS = 100
@@ -56,14 +56,14 @@ def filter_proxies_db():
 		proxy_port = row[2]
 		milis = None
 		if proxy_port in HTTP_PORT_TYPES:
-			ping_result = Proxy_Scrap.ping(SAMPLE_PING_WEB, proxy_ip=proxy_ip, proxy_port=proxy_port)
+			ping_result = Proxy_Scrap.ping(SAMPLE_PING_WEB, proxy_ip=proxy_ip, proxy_port=proxy_port, timeout=PING_TIMEOUT)
 		elif proxy_port in HTTPS_PORT_TYPES:
-			ping_result = Proxy_Scrap.ping(SAMPLE_PING_WEB, proxy_ip=proxy_ip, proxy_port=proxy_port)
+			ping_result = Proxy_Scrap.ping(SAMPLE_PING_WEB, proxy_ip=proxy_ip, proxy_port=proxy_port, timeout=PING_TIMEOUT)
 		#if port does not appear in predefined lists, we try each one
 		else:
-			ping_result = Proxy_Scrap.ping(SAMPLE_PING_WEB, proxy_ip=proxy_ip, proxy_port=proxy_port)
+			ping_result = Proxy_Scrap.ping(SAMPLE_PING_WEB, proxy_ip=proxy_ip, proxy_port=proxy_port, timeout=PING_TIMEOUT)
 			if ping_result is None:
-				ping_result = Proxy_Scrap.ping(SAMPLE_PING_WEB, proxy_ip=proxy_ip, proxy_port=proxy_port)
+				ping_result = Proxy_Scrap.ping(SAMPLE_PING_WEB, proxy_ip=proxy_ip, proxy_port=proxy_port, timeout=PING_TIMEOUT)
 		if ping_result is not None:
 			test_result = "PASS" if ping_result == 200 else "FAIL"
 		else: #if we do not have a status_code, it was a timeout, so it is also a fail

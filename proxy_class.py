@@ -1,10 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
-import time
 from selenium import webdriver
 import re #for regular expression operations
-import subprocess
-import pickle #for serializing and deserializing Python objects
 from typing import Optional, Union
 
 
@@ -25,7 +22,7 @@ class Proxy_Scrap:
         self.status_code = 0
 
     @classmethod
-    def ping(cls, url, proxy_ip=None, proxy_port=None, timeout=1):
+    def ping(cls, url, proxy_ip=None, proxy_port=None, timeout=5):
         if proxy_ip and proxy_port:
             #specify both HTTP and HTTPS keys, requests.get will know which one to use depending on the "url" arg provided to the function
             proxy = {'http': f'http://{proxy_ip}:{proxy_port}',
