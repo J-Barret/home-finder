@@ -1,11 +1,10 @@
 import requests
 from bs4 import BeautifulSoup
-from selenium import webdriver
 import re #for regular expression operations
 from typing import Optional, Union
 
 
-
+DEFAULT_PROXY_WEB = "https://free-proxy-list.net/"
 ipv4_pattern = r'\b(?:\d{1,3}\.){3}\d{1,3}\b'
 port_pattern = r'\b\d{1,5}\b'
 num_retries = 1
@@ -65,18 +64,20 @@ class Proxy_Scrap:
         proxy = None
         port = None
         for current_table in bs4_tables:
-            all_td = current_table.find_all('td') #extracts all "table data cell" elements -> element containing proxy IP and port
-            for this_td in all_td:
-                cleaned_td = this_td.text.strip() #cleaning all whitespaces
-                if re.search(ipv4_pattern, cleaned_td): #looking for IPV4 IP pattern
-                    proxy = cleaned_td
-                    all_siblings = this_td.find_next_siblings('td') #retrieve all "td" siblings in that same "tr" element
-                    for sibling in all_siblings:
-                        cleaned_sibling = sibling.text.strip()
-                        if re.search(port_pattern, cleaned_sibling): #looking for port pattern
-                            port = cleaned_sibling
-                            break
-                    break
+            #Only looking for HTTPS proxies
+            if current_table.find("td", class_="hx") and current_table.find("td", class_="hx").text == "yes":
+                all_td = current_table.find_all('td') #extracts all "table data cell" elements -> element containing proxy IP and port
+                for this_td in all_td:
+                    cleaned_td = this_td.text.strip() #cleaning all whitespaces
+                    if re.search(ipv4_pattern, cleaned_td): #looking for IPV4 IP pattern
+                        proxy = cleaned_td
+                        all_siblings = this_td.find_next_siblings('td') #retrieve all "td" siblings in that same "tr" element
+                        for sibling in all_siblings:
+                            cleaned_sibling = sibling.text.strip()
+                            if re.search(port_pattern, cleaned_sibling): #looking for port pattern
+                                port = cleaned_sibling
+                                break
+                        break
             if port and proxy:
                 self.proxy_dic[proxy] = port
                 proxy = None

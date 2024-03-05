@@ -1,8 +1,7 @@
 from proxy_class import *
 import sqlite3
 
-DEFAULT_PROXY_WEB = "https://free-proxy-list.net/"
-DB_NAME = "proxy.db"
+DB_NAME = "app.db"
 PROXIES_TABLE_CREATION = '''
     CREATE TABLE IF NOT EXISTS proxies (
         id INTEGER PRIMARY KEY,
@@ -12,10 +11,7 @@ PROXIES_TABLE_CREATION = '''
     )
 '''
 PING_TIMEOUT = 2
-SAMPLE_PING_WEB = "http://www.google.com"
-HTTP_PORT_TYPES = ["80", "8080", "8000", "8081", "8088", "8009", "8443"]
-HTTPS_PORT_TYPES = ["443", "8443", "2087", "2096"]
-MAX_LOOPS = 100
+SAMPLE_PING_WEB = "https://www.google.com"
 
 def get_proxy_list():  # no need to check for possible errors here, exceptions are managed at a lower level
 	proxy_obj = Proxy_Scrap(DEFAULT_PROXY_WEB)
@@ -54,16 +50,7 @@ def filter_proxies_db():
 		row_id = row[0]
 		proxy_ip = row[1]
 		proxy_port = row[2]
-		milis = None
-		if proxy_port in HTTP_PORT_TYPES:
-			ping_result = Proxy_Scrap.ping(SAMPLE_PING_WEB, proxy_ip=proxy_ip, proxy_port=proxy_port, timeout=PING_TIMEOUT)
-		elif proxy_port in HTTPS_PORT_TYPES:
-			ping_result = Proxy_Scrap.ping(SAMPLE_PING_WEB, proxy_ip=proxy_ip, proxy_port=proxy_port, timeout=PING_TIMEOUT)
-		#if port does not appear in predefined lists, we try each one
-		else:
-			ping_result = Proxy_Scrap.ping(SAMPLE_PING_WEB, proxy_ip=proxy_ip, proxy_port=proxy_port, timeout=PING_TIMEOUT)
-			if ping_result is None:
-				ping_result = Proxy_Scrap.ping(SAMPLE_PING_WEB, proxy_ip=proxy_ip, proxy_port=proxy_port, timeout=PING_TIMEOUT)
+		ping_result = Proxy_Scrap.ping(SAMPLE_PING_WEB, proxy_ip=proxy_ip, proxy_port=proxy_port, timeout=PING_TIMEOUT)
 		if ping_result is not None:
 			test_result = "PASS" if ping_result == 200 else "FAIL"
 		else: #if we do not have a status_code, it was a timeout, so it is also a fail

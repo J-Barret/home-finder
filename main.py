@@ -109,8 +109,8 @@ def contact(contactMessage : str):
 
 
 if __name__ == "__main__":
-	# proxy_list = get_proxy_list()
-	# generate_proxy_db(proxy_list)
-	# proxy_ip, proxy_port = filter_proxies_db() #looks for the first functional proxy
-	idealista_call(proxy_ip="96.114.36.9",proxy_port="80")
+	proxy_list = get_proxy_list()
+	generate_proxy_db(proxy_list)
+	proxy_ip, proxy_port = filter_proxies_db() #looks for the first functional proxy
+	# idealista_call(proxy_ip="96.114.36.9",proxy_port="80")
 	#idealista_parser()
