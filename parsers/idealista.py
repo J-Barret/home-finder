@@ -98,10 +98,3 @@ def idealista_parser():
 	db.commit()
 	db.close()
 
-def is_new_house():
-	#check if there are new houses in the DB
-	pass
-
-def contact(contactMessage : str):
-	#parse text file to choose which message to send
-	pass
