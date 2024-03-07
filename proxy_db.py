@@ -43,7 +43,8 @@ def filter_proxies_db():
 	cursor.execute("SELECT id, proxy_ip, proxy_port FROM proxies WHERE test = 'UNTESTED'")
 	all_rows = cursor.fetchall()
 	i = 0
-	print(f"There were found {len(all_rows)} UNTESTED proxies. Looking for a functional proxy...")
+	if(len(all_rows) > 0):
+		print(f"There were found {len(all_rows)} UNTESTED proxies. Looking for a functional proxy...")
 	for row in all_rows:
 		i += 1
 		print(f"\rProgress: {i}/{len(all_rows)}", end="", flush=True)
@@ -63,7 +64,8 @@ def filter_proxies_db():
 			return proxy_ip, proxy_port
 	db.commit()
 	db.close()
-	raise ValueError("No functional proxies were found in the database")
+	# print("No functional proxies were found in the database")
+	return None, None
 
 
 
