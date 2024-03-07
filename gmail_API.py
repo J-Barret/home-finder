@@ -29,12 +29,15 @@ def gmail_auth():
         with open("token.json", "w") as token:
             token.write(creds.to_json())
 
-def gmail_send_message(email):
+def gmail_send_message(email, new_houses_urls):
+    message_text = "Hello, these are the new flats found in the last search.\n"
+    message_text += "\n".join(new_houses_urls)
+    message_text += "\nBye!"
     creds = Credentials.from_authorized_user_file("token.json")
     try:
         service = build("gmail", "v1", credentials=creds)
         message = EmailMessage()
-        message.set_content("This is automated message mail")
+        message.set_content(message_text)
         message["To"] = email
         message["From"] = "home.finder.alert@gmail.com"
         message["Subject"] = "Automated message"
