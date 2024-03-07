@@ -1,0 +1,15 @@
+{
+  "price_range": {
+    "min": 0,
+    "max": 1000
+  },
+  "rooms_range": {
+    "min": 2,
+    "max": 5
+  },
+  "size_range": {
+    "min": 70,
+    "max": 150
+  },
+  "email": "jbarretin16@gmail.com"
+}

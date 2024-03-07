@@ -29,13 +29,13 @@ def gmail_auth():
         with open("token.json", "w") as token:
             token.write(creds.to_json())
 
-def gmail_send_message():
+def gmail_send_message(email):
     creds = Credentials.from_authorized_user_file("token.json")
     try:
         service = build("gmail", "v1", credentials=creds)
         message = EmailMessage()
         message.set_content("This is automated message mail")
-        message["To"] = "jbarretin16@gmail.com"
+        message["To"] = email
         message["From"] = "home.finder.alert@gmail.com"
         message["Subject"] = "Automated message"
         encoded_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
@@ -50,7 +50,3 @@ def gmail_send_message():
     except HttpError as error:
         print(f"An error occurred: {error}")
 
-
-if __name__ == "__main__":
-    gmail_auth()
-    gmail_send_message()
