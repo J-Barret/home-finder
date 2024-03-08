@@ -21,9 +21,10 @@ def read_ranges_from_json():
 		email = data['email']
 		proxy_protection = data['proxy_protection']
 		url = data['url']
-		return price_range, rooms_range, size_range, email, proxy_protection, url
+		cookie = data['cookie']
+		return price_range, rooms_range, size_range, email, proxy_protection, url, cookie
 
-def function_with_proxy(price_range, rooms_range, size_range, email, url):
+def function_with_proxy(price_range, rooms_range, size_range, email, url, cookie):
 	proxy_list = get_proxy_list()
 	generate_proxy_db(proxy_list)
 	print("RUNNING WITH PROXY... Press 'q' if you want to exit the program")
@@ -31,7 +32,7 @@ def function_with_proxy(price_range, rooms_range, size_range, email, url):
 	while True:
 		proxy_ip, proxy_port = filter_proxies_db() #looks for the first functional proxy
 		if(proxy_ip is not None and proxy_port is not None):
-			if (idealista_call(_url=url, proxy_ip=proxy_ip,proxy_port=proxy_port) is True):
+			if (idealista_call(_url=url, _cookie=cookie, proxy_ip=proxy_ip,proxy_port=proxy_port) is True):
 				idealista_parser()
 				evaluate_new_houses(price_range=price_range, rooms_range=rooms_range, size_range=size_range)
 				new_houses_urls = get_new_urls()
@@ -49,11 +50,11 @@ def function_with_proxy(price_range, rooms_range, size_range, email, url):
 		if keyboard.is_pressed('q'):
 			break
 
-def function_without_proxy(price_range, rooms_range, size_range, email, url):
+def function_without_proxy(price_range, rooms_range, size_range, email, url, cookie):
 	print("RUNNING WITHOUT PROXY... Press 'q' if you want to exit the program")
 	#-------------------------MAIN LOOP --------------------------------------------
 	while True:
-		if (idealista_call(_url=url) is True):
+		if (idealista_call(_url=url, _cookie=cookie) is True):
 			idealista_parser()
 			evaluate_new_houses(price_range=price_range, rooms_range=rooms_range, size_range=size_range)
 			new_houses_urls = get_new_urls()
@@ -66,11 +67,11 @@ def function_without_proxy(price_range, rooms_range, size_range, email, url):
 			break
 
 def main():
-	price_range, rooms_range, size_range, email, proxy_protection, url = read_ranges_from_json()
+	price_range, rooms_range, size_range, email, proxy_protection, url, cookie = read_ranges_from_json()
 	if(proxy_protection == "yes"):
-		function_with_proxy(price_range, rooms_range, size_range, email, url)
+		function_with_proxy(price_range, rooms_range, size_range, email, url, cookie)
 	elif(proxy_protection == "no"):
-		function_without_proxy(price_range, rooms_range, size_range, email, url)
+		function_without_proxy(price_range, rooms_range, size_range, email, url, cookie)
 	else:
 		print("Set a valid proxy_protection value in 'settings.json' please")
 
