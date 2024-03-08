@@ -25,8 +25,8 @@ COMMON_USER_AGENTS = [
     # Add more user agents as needed
 ]
 
-def idealista_call(proxy_ip=None, proxy_port=None):
-	url = "https://www.idealista.com/alquiler-viviendas/san-cristobal-de-la-laguna/la-laguna/?ordenado-por=fecha-publicacion-desc"
+def idealista_call(_url, proxy_ip=None, proxy_port=None):
+	url = _url
 	headers = {
 		'authority': 'www.idealista.com',
 		'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
