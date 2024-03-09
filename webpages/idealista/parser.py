@@ -78,20 +78,24 @@ def idealista_parser():
 		soup = BeautifulSoup(file, "html.parser")
 		all_houses = soup.find_all("div",class_="item-info-container")
 		for house in all_houses:
-			pictures_to_skip = house.find_all('picture', class_='logo-branding')
-			for picture in pictures_to_skip:
-				picture.decompose()  #to prevent house_id to be mistaken with agency logo (both use the same tag "href")
-			house_id = house.find("a")["href"] #gets the unique house ID
-			house_price = re.search(r'\d+', house.find("span", class_="item-price").get_text().replace('.', '')).group()
-			house_rooms = re.search(r'\d+', house.find("span", class_="item-detail").get_text().replace('.', '')).group()
-			house_size = re.search(r'\d+', house.find("span", class_="item-detail").find_next_sibling("span", class_="item-detail").get_text().replace('.', '')).group()
-			cursor.execute("SELECT id FROM houses WHERE "
-						   "idealista_id = ? AND price = ? AND rooms = ? AND squared_meters = ?",
-						   (house_id,house_price,house_rooms,house_size)) #look if house was already in DB
-			existing_row = cursor.fetchone()  # returns the first row of the SELECT query. If it is None, no duplicates were found
-			if existing_row is None:
-				cursor.execute("INSERT INTO houses (idealista_id, price, rooms, squared_meters) VALUES (?, ?, ?, ?)",
-							   (house_id,house_price,house_rooms,house_size))
+			try:
+				pictures_to_skip = house.find_all('picture', class_='logo-branding')
+				for picture in pictures_to_skip:
+					picture.decompose()  #to prevent house_id to be mistaken with agency logo (both use the same tag "href")
+				house_id = house.find("a")["href"] #gets the unique house ID
+				house_price = re.search(r'\d+', house.find("span", class_="item-price").get_text().replace('.', '')).group()
+				house_rooms = re.search(r'\d+', house.find("span", class_="item-detail").get_text().replace('.', '')).group()
+				house_size = re.search(r'\d+', house.find("span", class_="item-detail").find_next_sibling("span", class_="item-detail").get_text().replace('.', '')).group()
+				if (house_id and house_price and house_rooms and house_size):
+					cursor.execute("SELECT id FROM houses WHERE "
+								   "idealista_id = ? AND price = ? AND rooms = ? AND squared_meters = ?",
+								   (house_id,house_price,house_rooms,house_size)) #look if house was already in DB
+					existing_row = cursor.fetchone()  # returns the first row of the SELECT query. If it is None, no duplicates were found
+					if existing_row is None:
+						cursor.execute("INSERT INTO houses (idealista_id, price, rooms, squared_meters) VALUES (?, ?, ?, ?)",
+									   (house_id,house_price,house_rooms,house_size))
+			except Exception as e:
+				print(f"Error parsing element. Going to the next one. {e}")
 	db.commit()
 	db.close()
 
