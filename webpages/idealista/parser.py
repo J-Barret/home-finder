@@ -4,6 +4,7 @@ from proxy_db import *
 import requests
 import re
 
+DB_NAME = get_DB_name()
 MAIN_WEBPAGE = "https://www.idealista.com"
 HOUSES_TABLE_CREATION = '''
     CREATE TABLE IF NOT EXISTS houses (

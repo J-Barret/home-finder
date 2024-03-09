@@ -1,5 +1,6 @@
 from webpages.idealista.parser import *
 
+DB_NAME = get_DB_name()
 def evaluate_new_houses(price_range, rooms_range, size_range):
 	minPrice, maxPrice = price_range
 	minRooms, maxRooms = rooms_range

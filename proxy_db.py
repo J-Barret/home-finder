@@ -1,7 +1,8 @@
 from proxy_class import *
 import sqlite3
+from db import *
 
-DB_NAME = "app.db"
+DB_NAME = get_DB_name()
 PROXIES_TABLE_CREATION = '''
     CREATE TABLE IF NOT EXISTS proxies (
         id INTEGER PRIMARY KEY,

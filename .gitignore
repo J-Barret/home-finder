@@ -1,6 +1,7 @@
 credentials.json
 token.json
 app.db-journal
+*.db
 
 
 # Ignore compiled files
