@@ -50,7 +50,7 @@ def idealista_call(_url, _cookie, proxy_ip=None, proxy_port=None):
 	}
 	proxy = {'http': f'http://{proxy_ip}:{proxy_port}',
 			 'https': f'http://{proxy_ip}:{proxy_port}'}
-	for i in range(3):
+	for i in range(1):
 		try:
 			print("Connecting...")
 			if(proxy_ip and proxy_port):

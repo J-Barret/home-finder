@@ -4,10 +4,18 @@ from webpages.idealista.parser import *
 import json
 import keyboard
 import time
+import random
 
 PROXY_RETRY_TIME = 60
-WEBPAGE_RETRY_TIME = 120
-
+WEBPAGE_RETRY_TIME = [
+	90,
+	100,
+	110,
+	120,
+	130,
+	140,
+	150,
+]
 def contact(email, new_houses_urls):
 	gmail_auth()
 	gmail_send_message(email, new_houses_urls)
@@ -39,8 +47,8 @@ def function_with_proxy(price_range, rooms_range, size_range, email, url, cookie
 				if new_houses_urls:
 					contact(email, new_houses_urls)
 					print("Mail sent!")
-				print(f"Going to sleep, checking webpage again in {WEBPAGE_RETRY_TIME} seconds")
-				time.sleep(WEBPAGE_RETRY_TIME)
+				print(f"Going to sleep, checking webpage again in {random.choice(WEBPAGE_RETRY_TIME)} seconds")
+				time.sleep(random.choice(WEBPAGE_RETRY_TIME))
 			#if a connection was not established, look for the next UNTESTED proxy in the following loop
 		else:
 			print(f"\nNo functional proxies were found. Scraping new proxies in {PROXY_RETRY_TIME} seconds")
@@ -61,8 +69,8 @@ def function_without_proxy(price_range, rooms_range, size_range, email, url, coo
 			if new_houses_urls:
 				contact(email, new_houses_urls)
 				print("Mail sent!")
-		print(f"Going to sleep, checking webpage again in {WEBPAGE_RETRY_TIME} seconds")
-		time.sleep(WEBPAGE_RETRY_TIME)
+		print(f"Going to sleep, checking webpage again in {random.choice(WEBPAGE_RETRY_TIME)} seconds")
+		time.sleep(random.choice(WEBPAGE_RETRY_TIME))
 		if keyboard.is_pressed('q'):
 			break
 
