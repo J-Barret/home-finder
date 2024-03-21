@@ -2,7 +2,6 @@ from gmail_API import *
 from webpages.idealista.criteria_selector import *
 from webpages.idealista.parser import *
 import json
-import keyboard
 import time
 import random
 
@@ -35,7 +34,7 @@ def read_ranges_from_json():
 def function_with_proxy(price_range, rooms_range, size_range, email, url, cookie):
 	proxy_list = get_proxy_list()
 	generate_proxy_db(proxy_list)
-	print("RUNNING WITH PROXY... Press 'q' if you want to exit the program")
+	print("RUNNING WITH PROXY...")
 	#-------------------------MAIN LOOP --------------------------------------------
 	while True:
 		proxy_ip, proxy_port = filter_proxies_db() #looks for the first functional proxy
@@ -55,11 +54,9 @@ def function_with_proxy(price_range, rooms_range, size_range, email, url, cookie
 			time.sleep(PROXY_RETRY_TIME)
 			proxy_list = get_proxy_list()
 			generate_proxy_db(proxy_list)
-		if keyboard.is_pressed('q'):
-			break
 
 def function_without_proxy(price_range, rooms_range, size_range, email, url, cookie):
-	print("RUNNING WITHOUT PROXY... Press 'q' if you want to exit the program")
+	print("RUNNING WITHOUT PROXY...")
 	#-------------------------MAIN LOOP --------------------------------------------
 	while True:
 		if (idealista_call(_url=url, _cookie=cookie) is True):
@@ -71,8 +68,6 @@ def function_without_proxy(price_range, rooms_range, size_range, email, url, coo
 				print("Mail sent!")
 		print(f"Going to sleep, checking webpage again in {random.choice(WEBPAGE_RETRY_TIME)} seconds")
 		time.sleep(random.choice(WEBPAGE_RETRY_TIME))
-		if keyboard.is_pressed('q'):
-			break
 
 def main():
 	price_range, rooms_range, size_range, email, proxy_protection, url, cookie = read_ranges_from_json()
